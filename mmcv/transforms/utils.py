@@ -119,6 +119,8 @@ def cache_random_params(transforms: Union[BaseTransform, Iterable]):
     def _start_cache(t: BaseTransform):
         # Set cache enabled flag
         setattr(t, '_cache_enabled', True)
+
+        # Store the original method and init the counter
         if hasattr(t, '_cacheable_methods'):
             setattr(t, 'transform', _add_counter(t, 'transform'))
             for name in t._cacheable_methods:
