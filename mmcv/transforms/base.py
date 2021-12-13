@@ -5,7 +5,7 @@ from typing import Dict
 
 class BaseTransform(metaclass=ABCMeta):
 
-    def __call__(self, results: dict) -> dict:
+    def __call__(self, results: Dict) -> Dict:
 
         return self.transform(results)
 
