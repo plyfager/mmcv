@@ -1,4 +1,4 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from ..utils.registry import Registry
+from ..utils import Registry
 
 TRANSFORMS = Registry('transform')
