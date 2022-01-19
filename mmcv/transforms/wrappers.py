@@ -101,7 +101,11 @@ class Remap(BaseTransform):
             corresponds to the outer keys (i.e., the keys of the
             data/results), and should have a type of string, list or dict.
             None means not applying input mapping. Default: None.
+<<<<<<< b7136a28324534a78ff259d0f5f6e9963bc87ecd
         output_mapping (dict): A dict that defines the output key mapping.
+=======
+        output_mapping(dict): A dict that defines the output key mapping.
+>>>>>>> add docstrings
             The keys and values have the same meanings and rules as in the
             `input_mapping`. Default: None.
         inplace (bool): If True, an inverse of the input_mapping will be used
@@ -109,7 +113,11 @@ class Remap(BaseTransform):
             output_mapping should be None and strict should be True.
             Default: False.
         strict (bool): If True, the outer keys in the input_mapping must exist
+<<<<<<< b7136a28324534a78ff259d0f5f6e9963bc87ecd
             in the input data, or an exception will be raised. If False,
+=======
+            in the input data, or an excaption will be raised. If False,
+>>>>>>> add docstrings
             the missing keys will be assigned a special value `NotInResults`
             during input remapping. Default: True.
 
@@ -182,9 +190,14 @@ class Remap(BaseTransform):
 
         Args:
             data (dict): The original input data
+<<<<<<< b7136a28324534a78ff259d0f5f6e9963bc87ecd
             input_mapping (dict): The input key mapping. See the document of
                 `mmcv.transforms.wrappers.Remap` for details.
 
+=======
+            input_mapping(dict): The input key mapping. See the document of
+                mmcv.transforms.wrappers.Remap` for details.
+>>>>>>> add docstrings
         Returns:
             dict: The input data with remapped keys. This will be the actual
                 input of the wrapped pipeline.
@@ -225,7 +238,11 @@ class Remap(BaseTransform):
 
         Args:
             data (dict): The output of the wrapped pipeline.
+<<<<<<< b7136a28324534a78ff259d0f5f6e9963bc87ecd
             output_mapping (dict): The output key mapping. See the document of
+=======
+            input_mapping(dict): The output key mapping. See the document of
+>>>>>>> add docstrings
                 `mmcv.transforms.wrappers.Remap` for details.
 
         Returns:
