@@ -1,15 +1,13 @@
 from collections.abc import Sequence
 from typing import Dict, List
+import warnings
 
 import numpy as np
 import torch
 
 import mmcv
-from mmcv.utils import get_logger
 from .base import BaseTransform
 from .builder import TRANSFORMS
-
-logger = get_logger()
 
 
 @TRANSFORMS.register_module()
@@ -24,7 +22,7 @@ class ToTensor(BaseTransform):
             data = self._fetch_data(results, key)
             if data is None:
                 continue
-            results[key] = data
+            results[key] = self._to_tensor(data)
 
         return results
 
@@ -56,8 +54,8 @@ class ToTensor(BaseTransform):
 
         # if the first key not in results, return None
         if key_list[0] not in results:
-            logger.warning(f'{self.__class__.__name__}: {key}'
-                           f'is not in input dict.')
+            warnings.warn(f'{self.__class__.__name__}: {key}'
+                          f'is not in input dict.')
             return None
 
         current_item = results[key_list[0]]
@@ -65,8 +63,8 @@ class ToTensor(BaseTransform):
         for single_level_key in key_list[1:]:
             # if current key not in current item, return None
             if single_level_key not in current_item:
-                logger.warning(f'{self.__class__.__name__}: {key}'
-                               f'is not in input dict.')
+                warnings.warn(f'{self.__class__.__name__}: {key} '
+                              f'is not in input dict.')
                 return None
             current_item = current_item[single_level_key]
 
