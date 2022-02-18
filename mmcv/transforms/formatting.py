@@ -62,7 +62,14 @@ class ToTensor(BaseTransform):
             data = self._fetch_data(results, key)
             if data is None:
                 continue
-            results[key] = to_tensor(data)
+
+            key_list = key.split('.')
+            cur_item = results
+            for i in range(len(key_list)):
+                if i == len(key_list) - 1:
+                    cur_item[key_list[i]] = to_tensor(data)
+                    break
+                cur_item = cur_item[key_list[i]]
 
         return results
 
