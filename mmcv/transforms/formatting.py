@@ -1,6 +1,6 @@
 import warnings
 from collections.abc import Sequence
-from typing import Dict, List
+from typing import Dict, List, Union, Tuple
 
 import numpy as np
 import torch
@@ -10,7 +10,9 @@ from .base import BaseTransform
 from .builder import TRANSFORMS
 
 
-def to_tensor(data):
+def to_tensor(
+    data: Union[torch.Tensor, np.ndarray, Sequence, int,
+                float]) -> torch.Tensor:
     """Convert objects of various python types to :obj:`torch.Tensor`.
 
     Supported types are: :class:`numpy.ndarray`, :class:`torch.Tensor`,
@@ -18,6 +20,9 @@ def to_tensor(data):
     Args:
         data (torch.Tensor | numpy.ndarray | Sequence | int | float): Data to
             be converted.
+
+    Returns:
+        torch.Tensor: the converted data.
     """
 
     if isinstance(data, torch.Tensor):
@@ -98,7 +103,7 @@ class ImageToTensor(BaseTransform):
         keys (Sequence[str]): Key of images to be converted to Tensor.
     """
 
-    def __init__(self, keys):
+    def __init__(self, keys: Dict) -> None:
         self.keys = keys
 
     def transform(self, results: Dict) -> Dict:
@@ -175,7 +180,10 @@ class RandomFlip(BaseTransform):
              to call flip twice. Defaults to False.
     """
 
-    def __init__(self, prob=None, direction='horizontal', override=False):
+    def __init__(self,
+                 prob: Union[float, List(float), None] = None,
+                 direction: Union[str, List(str)] = 'horizontal',
+                 override: bool = False):
         if isinstance(prob, list):
             assert mmcv.is_list_of(prob, float)
             assert 0 <= sum(prob) <= 1
@@ -202,7 +210,8 @@ class RandomFlip(BaseTransform):
 
         self.override = override
 
-    def bbox_flip(self, bboxes, img_shape, direction):
+    def bbox_flip(self, bboxes: np.ndarray, img_shape: Tuple[int],
+                  direction: str) -> None:
         """Flip bboxes horizontally.
 
         Args:
@@ -234,7 +243,8 @@ class RandomFlip(BaseTransform):
             raise ValueError(f"Invalid flipping direction '{direction}'")
         return flipped
 
-    def keypoints_flip(self, keypoints, img_shape, direction):
+    def keypoints_flip(self, keypoints: np.ndarray, img_shape: Tuple[int],
+                       direction: str) -> None:
         """Flip keypoints horizontally, vertically or diagnally.
 
         Args:
@@ -263,7 +273,7 @@ class RandomFlip(BaseTransform):
             raise ValueError(f"Invalid flipping direction '{direction}'")
         return flipped
 
-    def _choose_direction(self):
+    def _choose_direction(self) -> str:
         """Choose the flip direction according to `prob` and `direction`"""
         if isinstance(self.direction, list):
             # None means non-flip
@@ -285,7 +295,7 @@ class RandomFlip(BaseTransform):
 
         return cur_dir
 
-    def _flip(self, results):
+    def _flip(self, results: Dict) -> None:
         """Resize images, bounding boxes, semantic segmentation map and
         keypoints."""
         # flip image
@@ -311,7 +321,7 @@ class RandomFlip(BaseTransform):
                 results['gt_semantic_seg'],
                 direction=results['flip_direction'])
 
-    def _flip_with_override(self, results):
+    def _flip_with_override(self, results: Dict) -> None:
         """Function to flip flip images, bounding boxes, semantic segmentation
         map and keypoints, when `override` is set to `True`"""
         cur_dir = self._choose_direction()
@@ -348,7 +358,7 @@ class RandomFlip(BaseTransform):
 
         return results
 
-    def __repr__(self):
+    def __repr__(self) -> None:
         return self.__class__.__name__ + f'(prob={self.prob})'
 
 
@@ -390,13 +400,13 @@ class RandomResize(BaseTransform):
     """
 
     def __init__(self,
-                 scale=None,
-                 ratio_range=None,
-                 keep_ratio=True,
-                 override=False,
-                 bbox_clip_border=True,
-                 backend='cv2',
-                 interpolation='bilinear'):
+                 scale: Union[tuple, List[tuple]] = None,
+                 ratio_range: Tuple[float] = None,
+                 keep_ratio: bool = True,
+                 override: bool = False,
+                 bbox_clip_border: bool = True,
+                 backend: str = 'cv2',
+                 interpolation: str = 'bilinear') -> None:
 
         assert scale is not None
 
@@ -409,7 +419,7 @@ class RandomResize(BaseTransform):
         self.interpolation = interpolation
 
     @staticmethod
-    def random_sample(scales):
+    def random_sample(scales: List[tuple]) -> tuple:
         """Randomly sample an scale is a list of tuple.
 
         Args:
@@ -429,7 +439,7 @@ class RandomResize(BaseTransform):
         return scale
 
     @staticmethod
-    def random_sample_ratio(scale, ratio_range):
+    def random_sample_ratio(scale: tuple, ratio_range: Tuple[float]) -> tuple:
         """Randomly sample an scale is a tuple.
 
         A ratio will be randomly sampled from the range specified by
@@ -450,7 +460,7 @@ class RandomResize(BaseTransform):
         scale = int(scale[0] * ratio), int(scale[1] * ratio)
         return scale
 
-    def _random_scale(self, results):
+    def _random_scale(self, results: Dict) -> None:
         """Randomly sample an scale according to the type of `scale`.
 
         Args:
@@ -470,7 +480,7 @@ class RandomResize(BaseTransform):
 
         results['scale'] = scale
 
-    def _resize_img(self, results):
+    def _resize_img(self, results: Dict) -> None:
         """Resize images with ``results['scale']``."""
 
         if results.get('img', None) is not None:
@@ -503,7 +513,7 @@ class RandomResize(BaseTransform):
             results['scale_factor'] = scale_factor
             results['keep_ratio'] = self.keep_ratio
 
-    def _resize_bboxes(self, results):
+    def _resize_bboxes(self, results: Dict) -> None:
         """Resize bounding boxes with ``results['scale_factor']``."""
         if results.get('gt_bboxes', None) is not None:
             bboxes = results['gt_bboxes'] * results['scale_factor']
@@ -513,7 +523,7 @@ class RandomResize(BaseTransform):
                                           results['height'])
             results['gt_bboxes'] = bboxes
 
-    def _resize_keypoints(self, results):
+    def _resize_keypoints(self, results: Dict) -> None:
         """Resize keypoints with ``results['scale_factor']``."""
         if results.get('gt_keypoints', None) is not None:
             keypoints = results['gt_keypoints'] * results['scale_factor'][:2]
@@ -524,7 +534,7 @@ class RandomResize(BaseTransform):
                                              results['height'])
             results['gt_keypoints'] = keypoints
 
-    def _resize_seg(self, results):
+    def _resize_seg(self, results: Dict) -> None:
         """Resize semantic segmentation map with ``results['scale']``."""
         if results.get('gt_semantic_seg', None) is not None:
             if self.keep_ratio:
@@ -541,7 +551,7 @@ class RandomResize(BaseTransform):
                     backend=self.backend)
             results['gt_semantic_seg'] = gt_seg
 
-    def transform(self, results):
+    def transform(self, results: Dict) -> Dict:
         """Transform function to resize images, bounding boxes, semantic
         segmentation map.
 
