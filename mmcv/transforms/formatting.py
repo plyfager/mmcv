@@ -183,8 +183,8 @@ class RandomFlip(BaseTransform):
     """
 
     def __init__(self,
-                 prob: Union[float, List(float), None] = None,
-                 direction: Union[str, List(str)] = 'horizontal',
+                 prob: Union[float, List[float], None] = None,
+                 direction: Union[str, List[str]] = 'horizontal',
                  override: bool = False) -> None:
         if isinstance(prob, list):
             assert mmcv.is_list_of(prob, float)
