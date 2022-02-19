@@ -179,12 +179,12 @@ class RandomFlip(BaseTransform):
          probability of 0.3, vertically with probability of 0.5.
      Args:
          prob (float | list[float], optional): The flipping probability.
-             Default: None.
+             Defaults to None.
          direction(str | list[str], optional): The flipping direction. Options
              are 'horizontal', 'vertical', 'diagonal'. Default: 'horizontal'.
              If input is a list, the length must equal ``prob``. Each
              element in ``prob`` indicates the flip probability of
-             corresponding direction.
+             corresponding direction. Defaults to horizontal.
          override (bool): Whether to override flip and flip_direction so as
              to call flip twice. Defaults to False.
     """
@@ -387,10 +387,11 @@ class RandomResize(BaseTransform):
       sampled from [`ratio_range[0]`, `ratio_range[1]`] uniformally.
 
     Args:
-        scale (tuple or list[tuple]): Images scales for resizing.
-        ratio_range (tuple[float]): (min_ratio, max_ratio)
+        scale (tuple or list[tuple]): Images scales for resizing. 
+            Defaults to None.
+        ratio_range (tuple[float]): (min_ratio, max_ratio). Defaults to None.
         keep_ratio (bool): Whether to keep the aspect ratio when resizing the
-            image.
+            image. Defaults to True.
         override (bool, optional): Whether to override `scale` and
             `scale_factor` so as to call resize twice. Default False. If True,
             after the first resizing, the existed `scale` and `scale_factor`
