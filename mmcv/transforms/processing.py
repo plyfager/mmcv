@@ -9,8 +9,8 @@ from .builder import TRANSFORMS
 
 @TRANSFORMS.register_module()
 class RandomFlip(BaseTransform):
-    """Flip the image & bbox & keypoints. Whether to flip the image will follow
-    the priorities below:
+    """Flip the image & bbox & keypoints & segmentation map. Whether to flip
+    the image will follow the priorities below:
 
      - if `override` is `False`:
          - if the input dict contains the key "flip" and "flip" is set `True`,
@@ -91,7 +91,7 @@ class RandomFlip(BaseTransform):
         self.override = override
 
     def bbox_flip(self, bboxes: np.ndarray, img_shape: Tuple[int],
-                  direction: str) -> None:
+                  direction: str) -> np.ndarray:
         """Flip bboxes horizontally.
 
         Args:
@@ -124,7 +124,7 @@ class RandomFlip(BaseTransform):
         return flipped
 
     def keypoints_flip(self, keypoints: np.ndarray, img_shape: Tuple[int],
-                       direction: str) -> None:
+                       direction: str) -> np.ndarray:
         """Flip keypoints horizontally, vertically or diagnally.
 
         Args:
@@ -176,7 +176,7 @@ class RandomFlip(BaseTransform):
         return cur_dir
 
     def _flip(self, results: dict) -> None:
-        """Resize images, bounding boxes, semantic segmentation map and
+        """Flip images, bounding boxes, semantic segmentation map and
         keypoints."""
         # flip image
         results['img'] = mmcv.imflip(
@@ -202,7 +202,7 @@ class RandomFlip(BaseTransform):
                 direction=results['flip_direction'])
 
     def _flip_with_override(self, results: dict) -> None:
-        """Function to flip flip images, bounding boxes, semantic segmentation
+        """Function to flip images, bounding boxes, semantic segmentation
         map and keypoints, when `override` is set to `True`"""
         cur_dir = self._choose_direction()
         if cur_dir is None:
@@ -220,7 +220,7 @@ class RandomFlip(BaseTransform):
         Args:
             results (dict): Result dict from loading pipeline.
         Returns:
-            dict: Resized results, 'img', 'gt_bboxes', 'gt_semantic_seg',
+            dict: Flipped results, 'img', 'gt_bboxes', 'gt_semantic_seg',
                 'gt_keypoints', 'flip', and 'flip_direction' keys are
                 updated in result dict.
         """
@@ -301,7 +301,7 @@ class RandomResize(BaseTransform):
 
     @staticmethod
     def random_sample(scales: List[tuple]) -> tuple:
-        """Randomly sample an scale is a list of tuple.
+        """Randomly sample a scale from a list of tuples.
 
         Args:
             scales (list[tuple]): Images scale range for sampling.
@@ -321,7 +321,7 @@ class RandomResize(BaseTransform):
 
     @staticmethod
     def random_sample_ratio(scale: tuple, ratio_range: Tuple[float]) -> tuple:
-        """Randomly sample an scale is a tuple.
+        """Randomly sample a scale from a tuple.
 
         A ratio will be randomly sampled from the range specified by
         ``ratio_range``. Then it would be multiplied with ``scale`` to

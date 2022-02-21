@@ -74,8 +74,8 @@ class ToTensor(BaseTransform):
         return results
 
     def _fetch_data(
-            self, results: dict,
-            key: str) -> Union[torch.Tensor, np.ndarray, Sequence, int, float]:
+        self, results: dict, key: str
+    ) -> Union[torch.Tensor, np.ndarray, Sequence, int, float, None]:
         # convert multi-level key to list
         key_list = key.split('.')
 
