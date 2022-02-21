@@ -9,7 +9,7 @@ from .builder import TRANSFORMS
 
 @TRANSFORMS.register_module()
 class RandomFlip(BaseTransform):
-    """Flip the image & bbox & keypoints & segmentation map. 
+    """Flip the image & bbox & keypoints & segmentation map.
 
     There are 3 flip modes:
 
@@ -181,7 +181,7 @@ class RandomFlip(BaseTransform):
 
     def _flip_with_flip_direction(self, results: dict) -> None:
         """Function to flip images, bounding boxes, semantic segmentation map
-        and keypoints"""
+        and keypoints."""
         cur_dir = self._choose_direction()
         if cur_dir is None:
             results['flip'] = False
