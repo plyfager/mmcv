@@ -202,8 +202,8 @@ class RandomFlip(BaseTransform):
                 direction=results['flip_direction'])
 
     def _flip_with_override(self, results: dict) -> None:
-        """Function to flip images, bounding boxes, semantic segmentation
-        map and keypoints, when `override` is set to `True`"""
+        """Function to flip images, bounding boxes, semantic segmentation map
+        and keypoints, when `override` is set to `True`"""
         cur_dir = self._choose_direction()
         if cur_dir is None:
             results['flip'] = False
