@@ -64,7 +64,7 @@ class TestToTensor:
         assert isinstance(results_tensor['img_label'], torch.Tensor)
 
         # Test multi-level key (multi-level key is in results)
-        results = {'instances': {'bbox': [1]}, 'img_label': [1]}
+        results = {'instances': {'bbox': [[0, 0, 10, 10]]}, 'img_label': [1]}
         results_tensor = TRANSFORMS.transform(copy.deepcopy(results))
         assert isinstance(results_tensor['instances']['bbox'], torch.Tensor)
 
