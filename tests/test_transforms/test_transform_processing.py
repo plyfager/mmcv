@@ -36,48 +36,34 @@ class TestRandomFlip:
         results = {
             'img': np.random.random((224, 224, 3)),
             'gt_bboxes': np.array([[0, 1, 100, 101]]),
-            'gt_keypoints': np.array([[100, 100]]),
+            'gt_keypoints': np.array([[100, 100, 1.0]]),
             'gt_semantic_seg': np.random.random((224, 224, 3))
         }
 
         # horizontal flip
-        TRANSFORMS = RandomFlip([1.0], ['horizontal'], override=True)
+        TRANSFORMS = RandomFlip([1.0], ['horizontal'])
         results_update = TRANSFORMS.transform(copy.deepcopy(results))
         assert (results_update['gt_bboxes'] == np.array([[124, 1, 224,
                                                           101]])).all()
 
         # diagnal flip
-        TRANSFORMS = RandomFlip([1.0], ['diagonal'], override=True)
+        TRANSFORMS = RandomFlip([1.0], ['diagonal'])
         results_update = TRANSFORMS.transform(copy.deepcopy(results))
         assert (results_update['gt_bboxes'] == np.array([[124, 123, 224,
                                                           223]])).all()
 
-        # horizontal flip when direction is str
-        TRANSFORMS = RandomFlip(1.0, override=True)
-        results_update = TRANSFORMS.transform(copy.deepcopy(results))
-        assert (results_update['gt_bboxes'] == np.array([[124, 1, 224,
-                                                          101]])).all()
-
-        # vertical flip when override is False
-        results.update({'flip': True, 'flip_direction': 'vertical'})
-        TRANSFORMS = RandomFlip(1.0, override=False)
+        # vertical flip
+        TRANSFORMS = RandomFlip([1.0], ['vertical'])
         results_update = TRANSFORMS.transform(copy.deepcopy(results))
         assert (results_update['gt_bboxes'] == np.array([[0, 123, 100,
                                                           223]])).all()
 
-        # flip with setting from init when flip_direction is None in results
-        results.update({'flip_direction': None})
+        # horizontal flip when direction is None
+        TRANSFORMS = RandomFlip(1.0)
         results_update = TRANSFORMS.transform(copy.deepcopy(results))
         assert (results_update['gt_bboxes'] == np.array([[124, 1, 224,
                                                           101]])).all()
 
-        # flip with setting from init when flip is False in results
-        results.update({'flip': False})
-        results_update = TRANSFORMS.transform(copy.deepcopy(results))
-        assert (results_update['gt_bboxes'] == np.array([[124, 1, 224,
-                                                          101]])).all()
-
-        # do not flip
         TRANSFORMS = RandomFlip(0.0)
         results_update = TRANSFORMS.transform(copy.deepcopy(results))
         assert (results_update['gt_bboxes'] == np.array([[0, 1, 100,
@@ -85,13 +71,13 @@ class TestRandomFlip:
 
         # flip direction is invalid in bbox flip
         with pytest.raises(ValueError):
-            TRANSFORMS = RandomFlip(1.0, override=False)
+            TRANSFORMS = RandomFlip(1.0)
             results_update = TRANSFORMS.bbox_flip(results['gt_bboxes'],
                                                   (224, 224), 'invalid')
 
         # flip direction is invalid in keypoints flip
         with pytest.raises(ValueError):
-            TRANSFORMS = RandomFlip(1.0, override=False)
+            TRANSFORMS = RandomFlip(1.0)
             results_update = TRANSFORMS.keypoints_flip(results['gt_keypoints'],
                                                        (224, 224), 'invalid')
 
@@ -122,62 +108,38 @@ class TestRandomResize:
 
         # choose target scale from init when override is True
         results = {}
-        TRANSFORMS = RandomResize((224, 224), (1.0, 2.0), override=True)
+        TRANSFORMS = RandomResize((224, 224), (1.0, 2.0))
         results_update = TRANSFORMS.transform(copy.deepcopy(results))
         assert results_update['scale'][0] >= 224 and results_update['scale'][
             0] <= 448
         assert results_update['scale'][1] >= 224 and results_update['scale'][
             1] <= 448
 
-        # choose target scale from results when override is False
-        results = {'scale': (224, 224)}
-        TRANSFORMS = RandomResize((224, 224), (1.0, 2.0), override=False)
-        results_update = TRANSFORMS.transform(copy.deepcopy(results))
-        assert results_update['scale'] == (224, 224)
-
-        # Use scale factor in results when override is False
+        # keep ratio is True
         results = {
-            'scale_factor': (1.0, 0.5, 1.0, 0.5),
             'img': np.random.random((224, 224, 3)),
             'gt_semantic_seg': np.random.random((224, 224, 3)),
             'gt_bboxes': np.array([[0, 0, 112, 112]]),
             'gt_keypoints': np.array([[112, 112]])
         }
-        TRANSFORMS = RandomResize((224, 224), (1.0, 2.0),
-                                  override=False,
-                                  keep_ratio=False)
+        TRANSFORMS = RandomResize((224, 224), (1.0, 2.0), keep_ratio=True)
         results_update = TRANSFORMS.transform(copy.deepcopy(results))
-        assert results_update['scale'] == (224, 112)
-        assert results_update['height'] == 112
-        assert results_update['width'] == 224
-        assert results_update['gt_semantic_seg'].shape == (112, 224, 3)
-        assert results_update['gt_bboxes'][0][2] == 112
-        assert results_update['gt_bboxes'][0][3] == 56
-        assert results_update['gt_keypoints'][0][0] == 112
-        assert results_update['gt_keypoints'][0][1] == 56
-
-        # keep ratio is True
-        results = {
-            'scale_factor': (1.0, 0.5, 1.0, 0.5),
-            'img': np.random.random((224, 224, 3)),
-            'gt_semantic_seg': np.random.random((224, 224, 3))
-        }
-        TRANSFORMS = RandomResize((224, 224), (1.0, 2.0),
-                                  override=False,
-                                  keep_ratio=True)
-        results_update = TRANSFORMS.transform(copy.deepcopy(results))
-        assert results_update['scale'] == (224, 112)
-        assert results_update['height'] == 112
-        assert results_update['width'] == 112
-        assert results_update['gt_semantic_seg'].shape == (112, 112, 3)
+        assert 224 <= results_update['height']
+        assert 448 >= results_update['height']
+        assert 224 <= results_update['width']
+        assert 448 >= results_update['width']
         assert results_update['keep_ratio']
+        assert results['gt_bboxes'][0][2] >= 112
+        assert results['gt_bboxes'][0][2] <= 112
+
+        # keep ratio is False
+        TRANSFORMS = RandomResize((224, 224), (1.0, 2.0), keep_ratio=False)
+        results_update = TRANSFORMS.transform(copy.deepcopy(results))
 
         # choose target scale from init when override is False and scale is a
         # list of tuples
         results = {}
-        TRANSFORMS = RandomResize([(224, 448), (112, 224)],
-                                  override=False,
-                                  keep_ratio=True)
+        TRANSFORMS = RandomResize([(224, 448), (112, 224)], keep_ratio=True)
         results_update = TRANSFORMS.transform(copy.deepcopy(results))
         assert results_update['scale'][0] >= 224 and results_update['scale'][
             0] <= 448
@@ -188,6 +150,5 @@ class TestRandomResize:
         with pytest.raises(NotImplementedError):
             results = {}
             TRANSFORMS = RandomResize([(224, 448), [112, 224]],
-                                      override=False,
                                       keep_ratio=True)
             results_update = TRANSFORMS.transform(copy.deepcopy(results))

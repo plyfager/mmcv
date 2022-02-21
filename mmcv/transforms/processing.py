@@ -9,28 +9,9 @@ from .builder import TRANSFORMS
 
 @TRANSFORMS.register_module()
 class RandomFlip(BaseTransform):
-    """Flip the image & bbox & keypoints & segmentation map. Whether to flip
-    the image will follow the priorities below:
+    """Flip the image & bbox & keypoints & segmentation map. 
 
-     - if `override` is `False`:
-         - if the input dict contains the key "flip" and "flip" is set `True`,
-           then flip the image.
-         - flip the image according to `prob`.
-     - if `override` is `True`:
-         - flip the image according to `prob`.
-
-     How to choose the "flip_direction" will follow the priorities below:
-
-     - if `override` is `False`:
-         - if the input dict contains the key "flip_direction", then flip the
-           image with "flip_direction".
-         - choose the "flip_direction" according to the probabilities defined
-           in `prob`.
-     - if `override` is `True`:
-         - choose the "flip_direction" according to the probabilities defined
-           in `prob`.
-
-    If `override` is True, there are 3 flip modes:
+    There are 3 flip modes:
 
      - ``prob`` is float, ``direction`` is string: the image will be
          ``direction``ly flipped with probability of ``prob`` .
@@ -56,14 +37,11 @@ class RandomFlip(BaseTransform):
              If input is a list, the length must equal ``prob``. Each
              element in ``prob`` indicates the flip probability of
              corresponding direction. Defaults to horizontal.
-         override (bool): Whether to override flip and flip_direction so as
-             to call flip twice. Defaults to False.
     """
 
     def __init__(self,
                  prob: Union[float, List[float], None] = None,
-                 direction: Union[str, List[str]] = 'horizontal',
-                 override: bool = False) -> None:
+                 direction: Union[str, List[str]] = 'horizontal') -> None:
         if isinstance(prob, list):
             assert mmcv.is_list_of(prob, float)
             assert 0 <= sum(prob) <= 1
@@ -87,8 +65,6 @@ class RandomFlip(BaseTransform):
 
         if isinstance(prob, list):
             assert len(self.prob) == len(self.direction)
-
-        self.override = override
 
     def bbox_flip(self, bboxes: np.ndarray, img_shape: Tuple[int],
                   direction: str) -> np.ndarray:
@@ -136,7 +112,8 @@ class RandomFlip(BaseTransform):
             numpy.ndarray: Flipped keypoints.
         """
 
-        assert keypoints.shape[-1] % 2 == 0
+        meta_info = keypoints[..., 2:]
+        keypoints = keypoints[..., :2]
         flipped = keypoints.copy()
         if direction == 'horizontal':
             w = img_shape[1]
@@ -151,6 +128,7 @@ class RandomFlip(BaseTransform):
             flipped[..., 1::2] = h - keypoints[..., 1::2]
         else:
             raise ValueError(f"Invalid flipping direction '{direction}'")
+        flipped = np.concatenate([keypoints, meta_info], axis=-1)
         return flipped
 
     def _choose_direction(self) -> str:
@@ -201,9 +179,9 @@ class RandomFlip(BaseTransform):
                 results['gt_semantic_seg'],
                 direction=results['flip_direction'])
 
-    def _flip_with_override(self, results: dict) -> None:
+    def _flip_with_flip_direction(self, results: dict) -> None:
         """Function to flip images, bounding boxes, semantic segmentation map
-        and keypoints, when `override` is set to `True`"""
+        and keypoints"""
         cur_dir = self._choose_direction()
         if cur_dir is None:
             results['flip'] = False
@@ -224,22 +202,16 @@ class RandomFlip(BaseTransform):
                 'gt_keypoints', 'flip', and 'flip_direction' keys are
                 updated in result dict.
         """
-        if self.override:
-            self._flip_with_override(results)
-        else:
-            if 'flip' in results and results['flip']:
-                if 'flip_direction' in results and results[
-                        'flip_direction'] is not None:
-                    self._flip(results)
-                else:
-                    self._flip_with_override(results)
-            else:
-                self._flip_with_override(results)
+        self._flip_with_flip_direction(results)
 
         return results
 
     def __repr__(self) -> None:
-        return self.__class__.__name__ + f'(prob={self.prob})'
+        repr_str = self.__class__.__name__
+        repr_str += f'(scale={self.prob}, '
+        repr_str += f'interpolation={self.direction})'
+
+        return repr_str
 
 
 @TRANSFORMS.register_module()
@@ -263,12 +235,6 @@ class RandomResize(BaseTransform):
         ratio_range (tuple[float]): (min_ratio, max_ratio). Defaults to None.
         keep_ratio (bool): Whether to keep the aspect ratio when resizing the
             image. Defaults to True.
-        override (bool, optional): Whether to override `scale` and
-            `scale_factor` so as to call resize twice. Default False. If True,
-            after the first resizing, the existed `scale` and `scale_factor`
-            will be ignored so the second resizing can be allowed.
-            This option is a work-around for multiple times of resize in DETR.
-            Defaults to False.
         bbox_clip_border (bool, optional): Whether to clip the objects outside
             the border of the image. In some dataset like MOT17, the gt bboxes
             are allowed to cross the border of images. Therefore, we don't
@@ -284,7 +250,6 @@ class RandomResize(BaseTransform):
                  scale: Union[tuple, List[tuple]] = None,
                  ratio_range: Tuple[float] = None,
                  keep_ratio: bool = True,
-                 override: bool = False,
                  bbox_clip_border: bool = True,
                  backend: str = 'cv2',
                  interpolation: str = 'bilinear') -> None:
@@ -294,7 +259,6 @@ class RandomResize(BaseTransform):
         self.scale = scale
         self.ratio_range = ratio_range
         self.keep_ratio = keep_ratio
-        self.override = override
         self.bbox_clip_border = bbox_clip_border
         self.backend = backend
         self.interpolation = interpolation
@@ -443,18 +407,7 @@ class RandomResize(BaseTransform):
                 'gt_keypoints', 'scale', 'scale_factor', 'height', 'width',
                 and 'keep_ratio' keys are updated in result dict.
         """
-        if self.override:
-            self._random_scale(results)
-        else:
-            if 'scale' in results:
-                pass
-            elif 'scale' not in results and 'scale_factor' in results:
-                h, w = results['img'].shape[:2]
-                scale_factor = results['scale_factor']
-                results['scale'] = (int(scale_factor[0] * w + 0.5),
-                                    int(scale_factor[1] * h + 0.5))
-            else:
-                self._random_scale(results)
+        self._random_scale(results)
 
         self._resize_img(results)
         self._resize_bboxes(results)
@@ -467,7 +420,6 @@ class RandomResize(BaseTransform):
         repr_str += f'(scale={self.scale}, '
         repr_str += f'ratio_range={self.ratio_range}, '
         repr_str += f'keep_ratio={self.keep_ratio}, '
-        repr_str += f'override={self.override}, '
         repr_str += f'bbox_clip_border={self.bbox_clip_border}, '
         repr_str += f'backend={self.backend}, '
         repr_str += f'interpolation={self.interpolation})'
