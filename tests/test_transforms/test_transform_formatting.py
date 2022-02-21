@@ -259,7 +259,7 @@ class TestRandomResize:
         assert results_update['gt_semantic_seg'].shape == (112, 112, 3)
         assert results_update['keep_ratio']
 
-        # choose target scale from init when override is False and scale is a 
+        # choose target scale from init when override is False and scale is a
         # list of tuples
         results = {}
         TRANSFORMS = RandomResize([(224, 448), (112, 224)],

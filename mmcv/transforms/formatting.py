@@ -1,6 +1,6 @@
 import warnings
 from collections.abc import Sequence
-from typing import List, Union, Tuple
+from typing import List, Tuple, Union
 
 import numpy as np
 import torch
@@ -387,7 +387,7 @@ class RandomResize(BaseTransform):
       sampled from [`ratio_range[0]`, `ratio_range[1]`] uniformally.
 
     Args:
-        scale (tuple or list[tuple]): Images scales for resizing. 
+        scale (tuple or list[tuple]): Images scales for resizing.
             Defaults to None.
         ratio_range (tuple[float]): (min_ratio, max_ratio). Defaults to None.
         keep_ratio (bool): Whether to keep the aspect ratio when resizing the
