@@ -5,9 +5,10 @@ except ImportError:
 else:
     from mmcv.transforms import ToTensor, to_tensor, ImageToTensor
 
-import pytest
-import numpy as np
 import copy
+
+import numpy as np
+import pytest
 
 
 @pytest.mark.skip(reason='no way of currently testing this')
