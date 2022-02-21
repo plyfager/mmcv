@@ -1,11 +1,13 @@
 import warnings
 from collections.abc import Sequence
+from typing import List, Union
+
 import numpy as np
 import torch
-from typing import List, Union
+
 import mmcv
-from .builder import TRANSFORMS
 from .base import BaseTransform
+from .builder import TRANSFORMS
 
 
 def to_tensor(
