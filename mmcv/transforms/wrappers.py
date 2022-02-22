@@ -63,6 +63,7 @@ class Compose(BaseTransform):
 
     def transform(self, results: Dict) -> Optional[Dict]:
         """Call function to apply transforms sequentially.
+
         Args:
             results (dict): A result dict contains the results to transform.
         Returns:
