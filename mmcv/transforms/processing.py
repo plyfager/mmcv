@@ -11,6 +11,9 @@ from .builder import TRANSFORMS
 class RandomFlip(BaseTransform):
     """Flip the image & bbox & keypoints & segmentation map.
 
+    Added or Updated keys: flip, flip_direction, img, gt_bboxes,
+    gt_semantic_seg, and gt_keypoints.
+
     There are 3 flip modes:
 
      - ``prob`` is float, ``direction`` is string: the image will be
@@ -218,6 +221,10 @@ class RandomFlip(BaseTransform):
 class RandomResize(BaseTransform):
     """Random resize images & bbox & keypoints.
 
+    Added or updated keys: scale, scale_factor, keep_ratio, img, height, width,
+    gt_bboxes, gt_semantic_seg, and gt_keypoints.
+
+
     How to choose the target scale to resize the image will follow the rules
     below:
 
@@ -264,8 +271,8 @@ class RandomResize(BaseTransform):
         self.interpolation = interpolation
 
     @staticmethod
-    def random_sample(scales: List[tuple]) -> tuple:
-        """Randomly sample a scale from a list of tuples.
+    def _random_sample(scales: List[tuple]) -> tuple:
+        """Private function to randomly sample a scale from a list of tuples.
 
         Args:
             scales (list[tuple]): Images scale range for sampling.
@@ -284,8 +291,8 @@ class RandomResize(BaseTransform):
         return scale
 
     @staticmethod
-    def random_sample_ratio(scale: tuple, ratio_range: Tuple[float]) -> tuple:
-        """Randomly sample a scale from a tuple.
+    def _random_sample_ratio(scale: tuple, ratio_range: Tuple[float]) -> tuple:
+        """Private function to randomly sample a scale from a tuple.
 
         A ratio will be randomly sampled from the range specified by
         ``ratio_range``. Then it would be multiplied with ``scale`` to
@@ -306,7 +313,8 @@ class RandomResize(BaseTransform):
         return scale
 
     def _random_scale(self, results: dict) -> None:
-        """Randomly sample an scale according to the type of `scale`.
+        """Private function to randomly sample an scale according to the type
+        of `scale`.
 
         Args:
             results (dict): Result dict from :obj:`dataset`.
@@ -317,9 +325,9 @@ class RandomResize(BaseTransform):
 
         if isinstance(self.scale, tuple):
             assert self.ratio_range is not None and len(self.ratio_range) == 2
-            scale = self.random_sample_ratio(self.scale, self.ratio_range)
+            scale = self._random_sample_ratio(self.scale, self.ratio_range)
         elif mmcv.is_list_of(self.scale, tuple):
-            scale = self.random_sample(self.scale)
+            scale = self._random_sample(self.scale)
         else:
             raise NotImplementedError
 
