@@ -14,12 +14,10 @@ from .base import BaseTransform
 class cacheable_method:
     """Decorator that marks a method of a transform class as a cacheable
     method.
-
     This decorator is usually used together with the context-manager
     :func`:cache_random_params`. In this context, a cacheable method will
     cache its return value(s) at the first time of being invoked, and always
     return the cached values when being invoked again.
-
     .. note::
         Only a instance method can be decorated as a cacheable_method.
     """
@@ -83,13 +81,11 @@ class cacheable_method:
 def cache_random_params(transforms: Union[BaseTransform, Iterable]):
     """Context-manager that enables the cache of cacheable methods in
     transforms.
-
     In this mode, cacheable methods will cache their return values on the
     first invoking, and always return the cached value afterward. This allow
     to apply random transforms in a deterministic way. For example, apply same
     transforms on multiple examples. See `cacheable_method` for more
     information.
-
     Args:
         transforms (BaseTransform|list[BaseTransform]): The transforms to
             enable cache.

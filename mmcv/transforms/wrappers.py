@@ -30,11 +30,9 @@ except ImportError:
 
 class Compose(BaseTransform):
     """Compose multiple transforms sequentially.
-
     Args:
         transforms (list[dict | callable]): Sequence of transform object or
             config dict to be composed.
-
     Examples:
         >>> pipeline = [
         >>>     dict(type='Compose',
@@ -65,10 +63,8 @@ class Compose(BaseTransform):
 
     def transform(self, results: Dict) -> Optional[Dict]:
         """Call function to apply transforms sequentially.
-
         Args:
             results (dict): A result dict contains the results to transform.
-
         Returns:
             dict or None: Transformed results.
         """
@@ -91,7 +87,6 @@ class Compose(BaseTransform):
 class Remap(BaseTransform):
     """A transform wrapper to remap and reorganize the input/output of the
     wrapped transforms (or sub-pipeline).
-
     Args:
         transforms (list[dict | callable]): Sequence of transform object or
             config dict to be wrapped.
@@ -101,11 +96,15 @@ class Remap(BaseTransform):
             corresponds to the outer keys (i.e., the keys of the
             data/results), and should have a type of string, list or dict.
             None means not applying input mapping. Default: None.
+<<<<<<< 44901cdd586d9562ecdc0a890fd19193374777b7
 <<<<<<< b7136a28324534a78ff259d0f5f6e9963bc87ecd
         output_mapping (dict): A dict that defines the output key mapping.
 =======
         output_mapping(dict): A dict that defines the output key mapping.
 >>>>>>> add docstrings
+=======
+        output_mapping (dict): A dict that defines the output key mapping.
+>>>>>>> [Fix]: resolve conflict
             The keys and values have the same meanings and rules as in the
             `input_mapping`. Default: None.
         inplace (bool): If True, an inverse of the input_mapping will be used
@@ -113,14 +112,17 @@ class Remap(BaseTransform):
             output_mapping should be None and strict should be True.
             Default: False.
         strict (bool): If True, the outer keys in the input_mapping must exist
+<<<<<<< 44901cdd586d9562ecdc0a890fd19193374777b7
 <<<<<<< b7136a28324534a78ff259d0f5f6e9963bc87ecd
             in the input data, or an exception will be raised. If False,
 =======
             in the input data, or an excaption will be raised. If False,
 >>>>>>> add docstrings
+=======
+            in the input data, or an exception will be raised. If False,
+>>>>>>> [Fix]: resolve conflict
             the missing keys will be assigned a special value `NotInResults`
             during input remapping. Default: True.
-
     Examples:
         >>> # Example 1: Remap 'gt_img' to 'img'
         >>> pipeline = [
@@ -187,9 +189,9 @@ class Remap(BaseTransform):
     def remap_input(self, data: Dict, input_mapping: Dict) -> Dict[str, Any]:
         """Remap inputs for the wrapped transforms by gathering and renaming
         data items according to the input_mapping.
-
         Args:
             data (dict): The original input data
+<<<<<<< 44901cdd586d9562ecdc0a890fd19193374777b7
 <<<<<<< b7136a28324534a78ff259d0f5f6e9963bc87ecd
             input_mapping (dict): The input key mapping. See the document of
                 `mmcv.transforms.wrappers.Remap` for details.
@@ -198,6 +200,10 @@ class Remap(BaseTransform):
             input_mapping(dict): The input key mapping. See the document of
                 mmcv.transforms.wrappers.Remap` for details.
 >>>>>>> add docstrings
+=======
+            input_mapping (dict): The input key mapping. See the document of
+                `mmcv.transforms.wrappers.Remap` for details.
+>>>>>>> [Fix]: resolve conflict
         Returns:
             dict: The input data with remapped keys. This will be the actual
                 input of the wrapped pipeline.
@@ -235,16 +241,18 @@ class Remap(BaseTransform):
     def remap_output(self, data: Dict, output_mapping: Dict) -> Dict[str, Any]:
         """Remap outputs from the wrapped transforms by gathering and renaming
         data items according to the output_mapping.
-
         Args:
             data (dict): The output of the wrapped pipeline.
+<<<<<<< 44901cdd586d9562ecdc0a890fd19193374777b7
 <<<<<<< b7136a28324534a78ff259d0f5f6e9963bc87ecd
             output_mapping (dict): The output key mapping. See the document of
 =======
             input_mapping(dict): The output key mapping. See the document of
 >>>>>>> add docstrings
+=======
+            output_mapping (dict): The output key mapping. See the document of
+>>>>>>> [Fix]: resolve conflict
                 `mmcv.transforms.wrappers.Remap` for details.
-
         Returns:
             dict: The output with remapped keys.
         """
@@ -288,7 +296,6 @@ class Remap(BaseTransform):
 class ApplyToMultiple(Remap):
     """A transform wrapper to apply the wrapped transforms to multiple data
     items. For example, apply Resize to multiple images.
-
     Args:
         transforms (list[dict | callable]): Sequence of transform object or
             config dict to be wrapped.
@@ -314,13 +321,11 @@ class ApplyToMultiple(Remap):
             have the same behavior on all data items. For example, to randomly
             flip either both input image and ground-truth image, or none.
             Default: False.
-
     .. note::
         To apply the transforms to each elements of a list or tuple, instead
         of separating data items, you can remap the outer key of the target
         sequence to the standard inner key. See example 2.
         example.
-
     Examples:
         >>> # Example 1:
         >>> pipeline = [
@@ -434,7 +439,6 @@ class ApplyToMultiple(Remap):
 @TRANSFORMS.register_module()
 class RandomChoice(BaseTransform):
     """Process data with a randomly chosen pipeline from given candidates.
-
     Args:
         pipelines (list[list]): A list of pipeline candidates, each is a
             sequence of transforms.
@@ -442,7 +446,6 @@ class RandomChoice(BaseTransform):
             with each pipeline. The length should be equal to the pipeline
             number and the sum should be 1. If not given, a uniform
             distribution will be assumed.
-
     Examples:
         >>> # config
         >>> pipeline = [

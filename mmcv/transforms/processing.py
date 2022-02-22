@@ -331,7 +331,7 @@ class RandomResize(BaseTransform):
         Args:
             results (dict): Result dict from :obj:`dataset`.
         Returns:
-            dict: One new key 'scale`is added into ``results``, 
+            dict: One new key 'scale`is added into ``results``,
             which would be used by subsequent pipelines.
         """
 
