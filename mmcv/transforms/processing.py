@@ -32,7 +32,29 @@ class RandomFlip(BaseTransform):
          E.g., ``prob=[0.3, 0.5]``, ``direction=['horizontal',
          'vertical']``, then image will be horizontally flipped with
          probability of 0.3, vertically with probability of 0.5.
-     Args:
+
+    Required Keys:
+
+        - img
+        - gt_bboxes
+        - gt_semantic_seg
+        - gt_keypoints
+
+    Modified Keys:
+
+        - img
+        - gt_bboxes
+        - gt_semantic_seg
+        - gt_keypoints
+
+    Added Keys:
+
+        - flip
+        - flip_direction
+
+
+
+    Args:
          prob (float | list[float], optional): The flipping probability.
              Defaults to None.
          direction(str | list[str], optional): The flipping direction. Options
@@ -247,6 +269,26 @@ class RandomResize(BaseTransform):
     - if `scale` is a tuple, the first and second values of the target scale
       is equal to the first and second values of `scale` multiplied by a value
       sampled from [`ratio_range[0]`, `ratio_range[1]`] uniformally.
+
+    Required Keys:
+
+        - img
+        - gt_bboxes
+        - gt_semantic_seg
+        - gt_keypoints
+
+    Modified Keys:
+
+        - img
+        - gt_bboxes
+        - gt_semantic_seg
+        - gt_keypoints
+
+    Added Keys:
+
+        - scale
+        - scale_factor
+        - keep_ratio
 
     Args:
         scale (tuple or list[tuple]): Images scales for resizing.
