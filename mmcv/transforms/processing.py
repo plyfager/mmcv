@@ -101,7 +101,9 @@ class RandomFlip(BaseTransform):
             flipped[..., 2::4] = w - bboxes[..., 0::4]
             flipped[..., 3::4] = h - bboxes[..., 1::4]
         else:
-            raise ValueError(f"Invalid flipping direction '{direction}'")
+            raise ValueError(
+                f"Flipping direction must be 'horizontal', 'vertical', \
+                  or 'diagnal', but got '{direction}'")
         return flipped
 
     def keypoints_flip(self, keypoints: np.ndarray, img_shape: Tuple[int],
@@ -132,7 +134,9 @@ class RandomFlip(BaseTransform):
             flipped[..., 0::2] = w - keypoints[..., 0::2]
             flipped[..., 1::2] = h - keypoints[..., 1::2]
         else:
-            raise ValueError(f"Invalid flipping direction '{direction}'")
+            raise ValueError(
+                f"Flipping direction must be 'horizontal', 'vertical', \
+                  or 'diagnal', but got '{direction}'")
         flipped = np.concatenate([keypoints, meta_info], axis=-1)
         return flipped
 
