@@ -214,8 +214,8 @@ class RandomFlip(BaseTransform):
             results (dict): Result dict from loading pipeline.
         Returns:
             dict: Flipped results, 'img', 'gt_bboxes', 'gt_semantic_seg',
-                'gt_keypoints', 'flip', and 'flip_direction' keys are
-                updated in result dict.
+            'gt_keypoints', 'flip', and 'flip_direction' keys are
+            updated in result dict.
         """
         self._flip_with_flip_direction(results)
 
@@ -331,8 +331,8 @@ class RandomResize(BaseTransform):
         Args:
             results (dict): Result dict from :obj:`dataset`.
         Returns:
-            dict: One new key 'scale`is added into \
-                ``results``, which would be used by subsequent pipelines.
+            dict: One new key 'scale`is added into ``results``, 
+            which would be used by subsequent pipelines.
         """
 
         if isinstance(self.scale, tuple):
@@ -425,8 +425,8 @@ class RandomResize(BaseTransform):
             results (dict): Result dict from loading pipeline.
         Returns:
             dict: Resized results, 'img', 'gt_bboxes', 'gt_semantic_seg',
-                'gt_keypoints', 'scale', 'scale_factor', 'height', 'width',
-                and 'keep_ratio' keys are updated in result dict.
+            'gt_keypoints', 'scale', 'scale_factor', 'height', 'width',
+            and 'keep_ratio' keys are updated in result dict.
         """
         self._random_scale(results)
 

@@ -123,7 +123,7 @@ class ImageToTensor(BaseTransform):
             results (dict): Result dict contains the image data to convert.
         Returns:
             dict: The result dict contains the image converted
-                to :obj:`torch.Tensor` and transposed to (C, H, W) order.
+            to :obj:`torch.Tensor` and transposed to (C, H, W) order.
         """
         for key in self.keys:
             img = results[key]
