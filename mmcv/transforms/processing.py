@@ -36,7 +36,6 @@ class RandomFlip(BaseTransform):
          prob (float | list[float], optional): The flipping probability.
              Defaults to None.
          direction(str | list[str], optional): The flipping direction. Options
-             are 'horizontal', 'vertical', 'diagonal'. Default: 'horizontal'.
              If input is a list, the length must equal ``prob``. Each
              element in ``prob`` indicates the flip probability of
              corresponding direction. Defaults to horizontal.
@@ -53,7 +52,9 @@ class RandomFlip(BaseTransform):
         elif prob is None:
             pass
         else:
-            raise ValueError('probs must be None, float or list of float')
+            raise ValueError(
+                f"probs must be None, float or list of float, but \
+                              got '{type(prob)}'.")
         self.prob = prob
 
         valid_directions = ['horizontal', 'vertical', 'diagonal']
@@ -63,7 +64,8 @@ class RandomFlip(BaseTransform):
             assert mmcv.is_list_of(direction, str)
             assert set(direction).issubset(set(valid_directions))
         else:
-            raise ValueError('direction must be either str or list of str')
+            raise ValueError(f"direction must be either str or list of str, \
+                               but got '{type(direction)}'.")
         self.direction = direction
 
         if isinstance(prob, list):
@@ -139,18 +141,24 @@ class RandomFlip(BaseTransform):
         if isinstance(self.direction, list):
             # None means non-flip
             direction_list = self.direction + [None]
-        else:
+        elif isinstance(self.direction, str):
             # None means non-flip
             direction_list = [self.direction, None]
+        else:
+            raise ValueError(f"Only support list and str, but \
+                               got '{type(self.direction)}'")
 
         if isinstance(self.prob, list):
             non_prob = 1 - sum(self.prob)
             prob_list = self.prob + [non_prob]
-        else:
+        elif isinstance(self.prob, float):
             non_prob = 1 - self.prob
             # exclude non-flip
             single_ratio = self.prob / (len(direction_list) - 1)
             prob_list = [single_ratio] * (len(direction_list) - 1) + [non_prob]
+        else:
+            raise ValueError(f"Only support list and float, but \
+                               got '{type(self.prob)}'")
 
         cur_dir = np.random.choice(direction_list, p=prob_list)
 
@@ -329,7 +337,8 @@ class RandomResize(BaseTransform):
         elif mmcv.is_list_of(self.scale, tuple):
             scale = self._random_sample(self.scale)
         else:
-            raise NotImplementedError
+            raise NotImplementedError(f"Do not support sampling function \
+                                        for '{self.scale}'")
 
         results['scale'] = scale
 
