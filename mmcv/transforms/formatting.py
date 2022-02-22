@@ -1,6 +1,6 @@
 import warnings
 from collections.abc import Sequence
-from typing import List, Union
+from typing import Union
 
 import numpy as np
 import torch
@@ -47,7 +47,7 @@ class ToTensor(BaseTransform):
         keys (Sequence[str]): Keys that need to be converted to Tensor.
     """
 
-    def __init__(self, keys: List[str]) -> None:
+    def __init__(self, keys: Sequence[str]) -> None:
         self.keys = keys
 
     def transform(self, results: dict) -> dict:
